@@ -1,0 +1,3 @@
+crear_producto Manzana;10;5.99;BodegaA
+crear_producto Pera;25;2.49;BodegaB
+crear_producto Banano;5;12.99;BodegaC
