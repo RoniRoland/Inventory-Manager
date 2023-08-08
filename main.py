@@ -1,3 +1,28 @@
+from productos import *
+import os
+
+# Funcion que verifica si el archivo existe o no, se utilizo la libreria OS
+def elegirArchivo():
+    # Leemos la ruta/nombre del archivo a leer por consola
+    archivo = str(input("Escribe el nombre o ruta del archivo para cargar: "))
+    while not os.path.isfile(archivo):  # Comprobamos que el archivo existe
+        print("\nERROR: No se encontró el archivo\n")
+        # Volvemos a leer la ruta/nombre del archivo
+        archivo = str(
+            input("Escribe el nombre o ruta del archivo para cargar: "))
+    else:
+        return archivo  # Si el archivo existe, devuelve la ruta/nombre
+
+
+
+
+
+
+
+
+
+
+
 def menuPrincipal():
     print(
         """\n==================================================================
