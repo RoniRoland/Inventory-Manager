@@ -1,11 +1,3 @@
-print("""\n============= LENGUAJES FORMALES DE PROGRAMACION B- ====================
-                        201212891
-                    Edgar Rolando Ramirez Lopez
-========================================================================\n""")
-input('\n      Presione cualquier tecla para continuar...       ')
-menuPrincipal()
-
-
 def menuPrincipal():
     print(
         """\n==================================================================
