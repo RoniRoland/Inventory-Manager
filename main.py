@@ -56,7 +56,7 @@ def menuPrincipal():
         try:
             option = int(input("Ingrese una opcion: "))
             if option == 1:
-                print('\n============CARGA DE ARCHIVO==============\n')
+                print('\n============CARGA ssDE ARCHIVO==============\n')
                 cargarInv(lista_productos)
                 print(
                     "\n********************ARCHIVO CARGADO EXITOSAMENTE*****************\n")
