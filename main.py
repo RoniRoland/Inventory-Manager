@@ -1,5 +1,6 @@
-from productos import *
+from productos import Producto
 import os
+lista_productos = []
 
 # Funcion que verifica si el archivo existe o no, se utilizo la libreria OS
 def elegirArchivo():
@@ -13,7 +14,22 @@ def elegirArchivo():
     else:
         return archivo  # Si el archivo existe, devuelve la ruta/nombre
 
-
+def cargarInv(lista):
+    archivo = elegirArchivo()
+    # Se verifica si el archivo no esta vacio para que se prosiga con la lectura
+    if archivo != None:
+        fichero = open(archivo, 'r')
+        
+    for linea in fichero:
+        partes = linea.strip().split(';')
+        if len(partes) == 4:
+            nombre = partes[0]
+            cantidad = int(partes[1])
+            precio_unitario = float(partes[2])
+            ubicacion = partes[3]
+            
+            producto = Producto(nombre, cantidad, precio_unitario, ubicacion)
+            lista.append(producto)
 
 
 
@@ -40,6 +56,12 @@ def menuPrincipal():
         try:
             option = int(input("Ingrese una opcion: "))
             if option == 1:
+                print('\n============CARGA DE ARCHIVO==============\n')
+                cargarInv(lista_productos)
+                print(
+                    "\n********************ARCHIVO CARGADO EXITOSAMENTE*****************\n")
+                input('\nPresione enter para continuar...')
+                menuPrincipal()
                 break
             elif option == 2:
                 break
