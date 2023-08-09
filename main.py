@@ -1,42 +1,119 @@
 from productos import Producto
 import os
-lista_productos = []
 
-# Funcion que verifica si el archivo existe o no, se utilizo la libreria OS
+
+def cargarInv(nombreArchivo):
+    lista_productos = []
+    with open(nombreArchivo, "r") as archivo:
+        lineas = archivo.readlines()
+
+    for linea in lineas:
+        partes = linea.strip().split(" ")
+        if len(partes) == 2 and partes[0] == "crear_producto":
+            sub_partes = partes[1].split(";")
+            if len(sub_partes) == 4:
+                nombre, cantidad, precio_unitario, ubicacion = sub_partes
+                producto = Producto(
+                    nombre, int(cantidad), float(precio_unitario), ubicacion
+                )
+                lista_productos.append(producto)
+
+    return lista_productos
+
+
 def elegirArchivo():
-    # Leemos la ruta/nombre del archivo a leer por consola
-    archivo = str(input("Escribe el nombre o ruta del archivo para cargar: "))
-    while not os.path.isfile(archivo):  # Comprobamos que el archivo existe
-        print("\nERROR: No se encontró el archivo\n")
-        # Volvemos a leer la ruta/nombre del archivo
-        archivo = str(
-            input("Escribe el nombre o ruta del archivo para cargar: "))
-    else:
-        return archivo  # Si el archivo existe, devuelve la ruta/nombre
-
-def cargarInv(lista):
-    archivo = elegirArchivo()
-    # Se verifica si el archivo no esta vacio para que se prosiga con la lectura
-    if archivo != None:
-        fichero = open(archivo, 'r')
-        
-    for linea in fichero:
-        partes = linea.strip().split(';')
-        if len(partes) == 4:
-            nombre = partes[0]
-            cantidad = int(partes[1])
-            precio_unitario = float(partes[2])
-            ubicacion = partes[3]
-            
-            producto = Producto(nombre, cantidad, precio_unitario, ubicacion)
-            lista.append(producto)
+    while True:
+        nombreArchivo = str(input("Escribe el nombre o ruta del archivo para cargar: "))
+        if nombreArchivo.endswith(".inv"):
+            if os.path.exists(nombreArchivo):  # Verificar si el archivo existe
+                print("\n*-*-*-*-*-Archivo cargado exitosamente.*-*-*-*-*-")
+                return nombreArchivo
+            else:
+                print("El archivo no existe.")
+        else:
+            print("El archivo debe tener la extensión .inv.")
 
 
+def elegirArchivoMovs():
+    while True:
+        nombreArchivo = str(input("Escribe el nombre o ruta del archivo para cargar: "))
+        if nombreArchivo.endswith(".mov"):
+            if os.path.exists(nombreArchivo):  # Verificar si el archivo existe
+                print("\n*-*-*-*-*-Instrucciones cargadas exitosamente.*-*-*-*-*-\n")
+                return nombreArchivo
+            else:
+                print("El archivo no existe.")
+        else:
+            print("El archivo debe tener la extensión .mov.")
 
 
+def informeInv(productos):
+    with open("informe_inventario.txt", "w") as archivo_salida:
+        archivo_salida.write("Informe de Inventario:\n")
+        archivo_salida.write("\n")
+        archivo_salida.write(
+            "Producto        Cantidad          Precio Unitario         Valor Total            Ubicacion\n"
+        )
+        archivo_salida.write(
+            "-------------------------------------------------------------------------------------------\n"
+        )
+
+        for producto in productos:
+            valor_total = producto.cantidad * producto.precio_unitario
+            valorFormateado = f"{valor_total:.2f}"
+            linea = f"{producto.nombre.ljust(15)} {str(producto.cantidad).ljust(20)} ${str(producto.precio_unitario).ljust(20)}  ${str(valorFormateado).ljust(20)}  {producto.ubicacion}\n"
+            archivo_salida.write(linea)
+
+        print("Informe de inventario generado exitosamente.")
 
 
+def actualizar_stock(productos, archivo_actualizar):
+    try:
+        with open(archivo_actualizar, "r") as archivo:
+            for linea in archivo:
+                datos = linea.strip().split(";")
 
+                if len(datos) == 3 and datos[0].startswith("agregar_stock"):
+                    nombre = datos[0].split()[1]
+                    cantidad = int(datos[1])
+                    ubicacion = datos[2]
+                    for producto in productos:
+                        if (
+                            producto.nombre == nombre
+                            and producto.ubicacion == ubicacion
+                        ):
+                            producto.cantidad += cantidad
+                            print(
+                                f"Se agregaron {cantidad} unidades de {nombre} en {ubicacion}."
+                            )
+                            break
+                    else:
+                        print(f"No se encontró el producto {nombre} en {ubicacion}.")
+
+                if len(datos) == 3 and datos[0].startswith("vender_producto"):
+                    nombre = datos[0].split()[1]
+                    cantidad = int(datos[1])
+                    ubicacion = datos[2]
+                    for producto in productos:
+                        if (
+                            producto.nombre == nombre
+                            and producto.ubicacion == ubicacion
+                        ):
+                            if producto.cantidad >= cantidad:
+                                producto.cantidad -= cantidad
+                                print(
+                                    f"Venta de {cantidad} unidades de {nombre} en {ubicacion} realizada."
+                                )
+                            else:
+                                print(
+                                    f"No hay suficiente stock de {nombre} en {ubicacion} para vender {cantidad}."
+                                )
+                            break
+                    else:
+                        print(f"No se encontró el producto {nombre} en {ubicacion}.")
+
+    except FileNotFoundError:
+        print("El archivo no existe.")
 
 
 def menuPrincipal():
@@ -52,21 +129,35 @@ def menuPrincipal():
         0.- Salir
 \n...................................................................\n"""
     )
+    option = int(input("Ingrese una opcion: "))
+    return option
+
+
+if __name__ == "__main__":
+    nuevos_productos = []
     while True:
+        option = menuPrincipal()
         try:
-            option = int(input("Ingrese una opcion: "))
             if option == 1:
-                print('\n============CARGA ssDE ARCHIVO==============\n')
-                cargarInv(lista_productos)
-                print(
-                    "\n********************ARCHIVO CARGADO EXITOSAMENTE*****************\n")
-                input('\nPresione enter para continuar...')
-                menuPrincipal()
-                break
+                print("\n============CARGA DE ARCHIVO==============\n")
+                nombreArchivo = elegirArchivo()
+                if nombreArchivo:
+                    nuevos_productos = cargarInv(nombreArchivo)
+                input("\nPresione enter para continuar...")
             elif option == 2:
-                break
+                if len(nuevos_productos) > 0:
+                    print("\n============CARGA DE ARCHIVO MOVIMIENTOS==============\n")
+                    nombreArchivoMovs = elegirArchivoMovs()
+                    if nombreArchivoMovs:
+                        actualizar_stock(nuevos_productos, nombreArchivoMovs)
+                else:
+                    print("No hay productos para realizar movimentos.")
             elif option == 3:
-                break
+                if len(nuevos_productos) > 0:
+                    informeInv(nuevos_productos)
+                    os.system("informe_inventario.txt")
+                else:
+                    print("\nNo hay productos para generar el informe.")
             elif option == 0:
                 break
             else:
@@ -74,13 +165,3 @@ def menuPrincipal():
         except ValueError:
             print("Opcion incorrecta")
     exit
-
-
-print(
-    """\n============= LENGUAJES FORMALES DE PROGRAMACION A- ====================
-                        201212891
-                    Edgar Rolando Ramirez Lopez
-========================================================================\n"""
-)
-input("\n      Presione cualquier tecla para continuar...       ")
-menuPrincipal()
