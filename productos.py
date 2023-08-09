@@ -4,4 +4,3 @@ class Producto:
         self.cantidad = cantidad
         self.precio_unitario = precio_unitario
         self.ubicacion = ubicacion
-
