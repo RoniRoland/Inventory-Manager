@@ -59,10 +59,12 @@ def informeInv(productos):
         )
 
         for producto in productos:
-            valor_total = producto.cantidad * producto.precio_unitario
-            valorFormateado = f"{valor_total:.2f}"
-            linea = f"{producto.nombre.ljust(15)} {str(producto.cantidad).ljust(20)} ${str(producto.precio_unitario).ljust(20)}  ${str(valorFormateado).ljust(20)}  {producto.ubicacion}\n"
-            archivo_salida.write(linea)
+            if producto.cantidad > 0:
+                valor_total = producto.cantidad * producto.precio_unitario
+                valorFormateado = f"{valor_total:.2f}"
+                precioPorUnidad = f"{producto.precio_unitario:.2f}"
+                linea = f"{producto.nombre.ljust(15)} {str(producto.cantidad).ljust(20)} ${str(precioPorUnidad).ljust(20)}  ${str(valorFormateado).ljust(20)}  {producto.ubicacion}\n"
+                archivo_salida.write(linea)
 
         print("Informe de inventario generado exitosamente.")
 
@@ -83,12 +85,12 @@ def actualizar_stock(productos, archivo_actualizar):
                             and producto.ubicacion == ubicacion
                         ):
                             producto.cantidad += cantidad
-                            print(
-                                f"Se agregaron {cantidad} unidades de {nombre} en {ubicacion}."
-                            )
+
                             break
                     else:
-                        print(f"No se encontró el producto {nombre} en {ubicacion}.")
+                        print(
+                            f"\n=====ERROR==== No se encontró el producto {nombre} en {ubicacion} =======\n"
+                        )
 
                 if len(datos) == 3 and datos[0].startswith("vender_producto"):
                     nombre = datos[0].split()[1]
@@ -101,16 +103,16 @@ def actualizar_stock(productos, archivo_actualizar):
                         ):
                             if producto.cantidad >= cantidad:
                                 producto.cantidad -= cantidad
-                                print(
-                                    f"Venta de {cantidad} unidades de {nombre} en {ubicacion} realizada."
-                                )
+
                             else:
                                 print(
-                                    f"No hay suficiente stock de {nombre} en {ubicacion} para vender {cantidad}."
+                                    f"\n=====ERROR==== No hay suficiente stock de {nombre} en {ubicacion} para vender {cantidad} =======\n"
                                 )
                             break
                     else:
-                        print(f"No se encontró el producto {nombre} en {ubicacion}.")
+                        print(
+                            f"\n=====ERROR==== No se encontró el producto {nombre} en {ubicacion} =======\n"
+                        )
 
     except FileNotFoundError:
         print("El archivo no existe.")
